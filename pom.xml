@@ -1,0 +1,172 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>pact</groupId>
+  <artifactId>pacttest</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
+  <name>pacttest</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+        <version>3.4.3</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test -->
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <version>3.4.3</version>
+        <scope>test</scope>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>2.0.17</version>
+    </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/au.com.dius/pact-jvm-consumer-junit5 -->
+    <dependency>
+        <groupId>au.com.dius</groupId>
+        <artifactId>pact-jvm-consumer-junit5</artifactId>
+        <version>4.0.10</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/au.com.dius/pact-jvm-provider-junit5 -->
+    <dependency>
+        <groupId>au.com.dius</groupId>
+        <artifactId>pact-jvm-provider-junit5</artifactId>
+        <version>4.0.10</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-api</artifactId>
+        <version>5.12.0</version>
+        <scope>test</scope>
+    </dependency>
+    <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-engine</artifactId>
+        <version>5.12.0</version>
+        <scope>test</scope>
+    </dependency>
+  </dependencies>    
+
+<profiles>
+    <!-- Consumer Tests Profile -->
+    <profile>
+        <id>consumer-tests</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+        <build>
+            <plugins>
+                <!-- Failsafe Plugin for Consumer Tests -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.5.2</version>
+                    <executions>
+                        <execution>
+                            <id>integration-tests</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>**/pact/consumer/**/*.java</include>
+                        </includes>
+                        <excludes>
+                            <exclude>**/pact/provider/**/*.java</exclude>  <!-- Exclude consumer tests -->
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </build>
+    </profile>
+
+    <!-- Provider Tests Profile -->
+    <profile>
+        <id>provider-tests</id>
+        <activation>
+            <activeByDefault>false</activeByDefault>
+        </activation>
+        <build>
+
+<plugins>
+                <!-- Failsafe Plugin for Provider Tests -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.5.2</version>
+                    <executions>
+                        <execution>
+                            <id>integration-tests</id>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <includes>
+                            <include>**/pact/provider/**/*.java</include>  <!--  Include provider tests -->
+                        </includes>
+                        <excludes>
+                            <exclude>**/pact/consumer/**/*.java</exclude>  <!--  Exclude consumer tests -->
+                        </excludes>
+                    </configuration>
+                </plugin>
+            </plugins>
+            
+        </build>
+    </profile>
+</profiles>
+
+<build>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.8.1</version>
+              <configuration>
+                    <compilerArgument>-parameters</compilerArgument>
+              </configuration>
+          </plugin>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+            <version>3.4.3</version> 
+        </plugin> 
+        <plugin>
+            <groupId>au.com.dius.pact.provider</groupId>
+            <artifactId>maven</artifactId>
+            <version>4.6.17</version>
+            <configuration>
+                <pactDirectory>target/pacts</pactDirectory> <!-- Defaults to ${project.build.directory}/pacts -->
+                <pactBrokerUrl>https://hcl-c789883e.pactflow.io</pactBrokerUrl>
+                <pactBrokerToken>3nFPGowqFQKJaNX00caYHA</pactBrokerToken>
+            </configuration>
+        </plugin>
+      </plugins>
+  </build>
+
+</project>

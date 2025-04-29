@@ -1,0 +1,43 @@
+# Maven
+# Build your Java project and run tests with Apache Maven.
+# Add steps that analyze code, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+
+trigger:
+  - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: Maven@4
+    inputs:
+      mavenPomFile: 'pom.xml'
+      mavenOptions: '-Xmx3072m'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '17'
+      jdkArchitectureOption: 'x64'
+      goals: 'clean'
+    displayName: 'Environment Setup'
+
+  - task: Bash@3
+    inputs:
+      targetType: 'inline'
+      script: |
+        mvn install -U
+        mvn spring-boot:run & echo $! > springboot.pid # Run in background & save PID
+        while ! nc -z localhost 8081; do sleep 5; done # Wait for app to start
+        mvn verify -Pprovider-tests
+    displayName: 'Run Spring Boot and Provider Tests'
+
+  # Post-job cleanup step
+  - task: Bash@3
+    condition: always()  # Ensures this runs even if previous steps fail
+    inputs:
+      targetType: 'inline'
+      script: |
+        if [ -f "springboot.pid" ]; then
+          kill $(cat springboot.pid) || echo "Process already stopped"
+          rm -f springboot.pid
+        fi
+    displayName: 'Post-job Cleanup - Stop Spring Boot'
