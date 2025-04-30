@@ -163,7 +163,7 @@
             <configuration>
                 <pactDirectory>target/pacts</pactDirectory> <!-- Defaults to ${project.build.directory}/pacts -->
                 <pactBrokerUrl>https://hcl-c789883e.pactflow.io</pactBrokerUrl>
-                <pactBrokerToken>3nFPGowqFQKJaNX00caYHA</pactBrokerToken>
+                <pactBrokerToken>key</pactBrokerToken>
             </configuration>
         </plugin>
       </plugins>
